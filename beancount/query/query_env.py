@@ -55,6 +55,17 @@ class NegPosition(_Neg):
 class NegInventory(_Neg):
     __intypes__ = [inventory.Inventory]
 
+class RoundDecimal(query_compile.EvalFunction):
+    "Rounds a decimal to the specified number of decimal digits"
+    __intypes__ = [Decimal, int]
+
+    def __init__(self, operands):
+        super().__init__(operands, Decimal)
+
+    def __call__(self, context):
+        args = self.eval_args(context)
+        return round(args[0], args[1])
+
 class ToDecimal(query_compile.EvalFunction):
     "Converts a string into a Decimal type, defaulting to no value if input is not parseable as decimal"
     __intypes__ = [str]
@@ -910,6 +921,7 @@ SIMPLE_FUNCTIONS = {
     ('safediv', Decimal, int)                            : SafeDivInt,
     'length'                                             : Length,
     'str'                                                : Str,
+    ('round', Decimal, int)                              : RoundDecimal,
     ('decimal', str)                                     : ToDecimal,
     ('decimal', str, Decimal)                            : ToDecimalDefault,
     'maxwidth'                                           : MaxWidth,
